@@ -4,44 +4,10 @@ import { useParams } from "react-router-dom";
 
 const SearchedCard = () => {
   const [city, setCity] = useState(null);
-  const [forecast, setForecast] = useState([]); // Stato per le previsioni meteo
-  const { lat, lon } = useParams(); // Estrai lat e lon dalla URL
+  const [forecast, setForecast] = useState([]);
+  const [bgImage, setBgImage] = useState(null); // Stato per l'immagine di sfondo
+  const { lat, lon } = useParams(); // Estrarre lat e lon dalla URL
 
-  useEffect(() => {
-    fetchWeatherData();
-  }, [lat, lon]); // Effettua il fetch quando lat e lon cambiano
-
-  const fetchWeatherData = async () => {
-    try {
-      // Fetch dati meteo correnti
-      const weatherResponse = await fetch(
-        `https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&appid=91b5ca7dea770ebd38fd11f37f7289c5`
-      );
-
-      if (weatherResponse.ok) {
-        const weatherData = await weatherResponse.json();
-        setCity(weatherData);
-      } else {
-        console.error("Errore nel recupero dei dati meteo correnti");
-      }
-
-      // Fetch previsioni meteo (usando le variabili lat e lon)
-      const forecastResponse = await fetch(
-        `https://api.openweathermap.org/data/2.5/forecast?lat=${lat}&lon=${lon}&appid=91b5ca7dea770ebd38fd11f37f7289c5`
-      );
-
-      if (forecastResponse.ok) {
-        const forecastData = await forecastResponse.json();
-        setForecast(forecastData.list); // Lista delle previsioni
-      } else {
-        console.error("Errore nel recupero delle previsioni meteo");
-      }
-    } catch (error) {
-      console.error("Errore di rete:", error);
-    }
-  };
-
-  // Funzione per formattare la data cosi ottengo per esempio "Ven 14 Febbraio"
   const formatDate = (date) => {
     const options = { weekday: "short", day: "numeric", month: "long" };
     const formattedDate = new Date(date).toLocaleDateString("it-IT", options);
@@ -54,14 +20,73 @@ const SearchedCard = () => {
     return `${capitalizedDay} ${dayNumber} ${capitalizedMonth}`;
   };
 
+  useEffect(() => {
+    fetchWeatherData();
+  }, [lat, lon]);
+
+  const fetchWeatherData = async () => {
+    try {
+      const weatherResponse = await fetch(
+        `https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&appid=91b5ca7dea770ebd38fd11f37f7289c5`
+      );
+
+      if (weatherResponse.ok) {
+        const weatherData = await weatherResponse.json();
+        setCity(weatherData);
+
+        // Dopo aver ottenuto il nome della città, posso usarla nella funzione che fetcha unsplash
+        if (weatherData.name) {
+          fetchBackgroundImage(weatherData.name);
+        }
+      } else {
+        console.error("Errore nel recupero dei dati meteo correnti");
+      }
+
+      // lo so che è una cosa in più ma mi faceva troppo incazzare che l'api di openweather non mi dava uno sfondo per la città selezionata quindi mi sono iscritto ad unsplash
+      // ho provato un pò l'api di unsplash e devo dire che era un pò complessa quindi non sempre prende foto che vanno bene, tra l'altro ha un limite di 50 richieste l'ora... spero vada bene!
+
+      const forecastResponse = await fetch(
+        `https://api.openweathermap.org/data/2.5/forecast?lat=${lat}&lon=${lon}&appid=91b5ca7dea770ebd38fd11f37f7289c5`
+      );
+
+      if (forecastResponse.ok) {
+        const forecastData = await forecastResponse.json();
+        setForecast(forecastData.list);
+      } else {
+        console.error("Errore nel recupero delle previsioni meteo");
+      }
+    } catch (error) {
+      console.error("Errore di rete:", error);
+    }
+  };
+
+  const fetchBackgroundImage = async (cityName) => {
+    try {
+      const response = await fetch(
+        `https://api.unsplash.com/photos/random?query=${cityName}&client_id=aks67fyYJx6omX1SQSnqbH5W2FimWcGDOSw1B35BUIo`
+      );
+
+      if (response.ok) {
+        const data = await response.json();
+        setBgImage(data.urls.raw); // Imposta l'immagine di sfondo
+      } else {
+        console.error("Errore nel recupero dell'immagine di sfondo");
+      }
+    } catch (error) {
+      console.error("Errore di rete durante il fetch dell'immagine:", error);
+    }
+  };
+
   return (
     <Col xs={12} md={12} lg={12}>
-      {/* Card per il meteo corrente */}
       <Row className="mb-4">
         <Col xs={12}>
           <Card
             style={{
-              backgroundImage: `url(https://images.unsplash.com/photo-1557683316-973673baf926?q=80&w=2029&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D)`, // Imposta il background a tutte le card
+              backgroundImage: `url(${
+                bgImage ||
+                "https://plus.unsplash.com/premium_photo-1701596398952-5c142b34da08?q=80&w=1932&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
+              })`,
               backgroundSize: "cover",
               backgroundPosition: "center",
               color: "white",
@@ -94,7 +119,6 @@ const SearchedCard = () => {
                       height: "80px",
                     }}
                   />
-
                   <Card.Title>{city.name}</Card.Title>
                   <Card.Text>{Math.round(city.main.temp - 273.15)}°C</Card.Text>
                   <Card.Text className="text-capitalize">{city.weather[0].description}</Card.Text>
@@ -105,7 +129,7 @@ const SearchedCard = () => {
                   <Card.Text>Percepita: {Math.round(city.main.feels_like - 273.15)}°C</Card.Text>
                 </>
               ) : (
-                <Card.Text>Caricamento dati...</Card.Text> // Messaggio durante il caricamento
+                <Card.Text>Caricamento dati...</Card.Text>
               )}
             </Card.Body>
           </Card>
@@ -116,17 +140,18 @@ const SearchedCard = () => {
       <Row>
         {forecast.length > 0 ? (
           forecast.map((item, index) => {
-            const date = new Date(item.dt * 1000); // Converto il timestamp in data
-            const temp = Math.round(item.main.temp - 273.15); // Converto la temperatura da Kelvin a Celsius
-
-            // Ottengo il giorno della settimana usando la funzione di formattazione della data
+            const date = new Date(item.dt * 1000);
+            const temp = Math.round(item.main.temp - 273.15);
             const day = formatDate(date);
 
             return (
               <Col key={index} xs={12} sm={6} md={4} lg={3}>
                 <Card
                   style={{
-                    backgroundImage: `url(https://images.unsplash.com/photo-1557683316-973673baf926?q=80&w=2029&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D)`, // Background per le card delle previsioni
+                    backgroundImage: `url(${
+                      bgImage ||
+                      "https://plus.unsplash.com/premium_photo-1701596398952-5c142b34da08?q=80&w=1932&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
+                    })`,
                     backgroundSize: "cover",
                     backgroundPosition: "center",
                     color: "white",
@@ -139,12 +164,10 @@ const SearchedCard = () => {
                       alt={item.weather[0].description}
                       style={{ width: "50px", height: "50px", position: "absolute", top: 10, right: 10 }}
                     />
-
                     <Card.Title>
                       <div>{day}</div>
                       <div>{`${date.getHours()}:${String(date.getMinutes()).padStart(2, "0")}`}</div>
                     </Card.Title>
-
                     <Card.Text>Temp: {temp}°C</Card.Text>
                     <Card.Text className="text-capitalize">{item.weather[0].description}</Card.Text>
                   </Card.Body>
@@ -153,7 +176,7 @@ const SearchedCard = () => {
             );
           })
         ) : (
-          <Card.Text>Caricamento previsioni...</Card.Text> // Messaggio durante il caricamento delle previsioni
+          <Card.Text>Caricamento previsioni...</Card.Text>
         )}
       </Row>
     </Col>

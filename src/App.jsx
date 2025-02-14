@@ -51,13 +51,14 @@ function App() {
               </Container>
 
               <Container fluid>
-                <Row style={{ marginTop: "150px" }}>
+                <Row style={{ marginTop: "50px" }}>
                   {/* Se l'utente accetta di mandare la localizzazione al brower la prima card sarà della sua località attuale (ho cercato su internet questa chicca che voleto mettere, la foto è relativa a catania purtroppo che è la mia corrente) */}
                   {userLocation && (
                     <Cards
                       bgImage="https://images.unsplash.com/photo-1584198686005-d9f5d63efa0e?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
                       lat={userLocation.lat}
                       lon={userLocation.lon}
+                      isUserLocation={true} // Passa props che è la location dell'utente per poter mettere l'icona classica dei siti meteo per la tua locazione attuale
                     />
                   )}
                   {/* 4 card statiche che ho messo io con sfondo relativo a loro (volevo mettere lo sfondo relativo anche nella pagina searched card ma non sapevo come fare*/}

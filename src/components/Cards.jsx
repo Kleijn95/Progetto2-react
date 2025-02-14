@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { Button, Card, Col } from "react-bootstrap";
+import { GeoAlt } from "react-bootstrap-icons";
 import { Link } from "react-router-dom";
 
 const Cards = (props) => {
@@ -29,6 +30,7 @@ const Cards = (props) => {
   return (
     <Col xs={12} md={6} lg={3}>
       <Card
+        className="mb-2"
         style={{
           backgroundImage: `url(${props.bgImage})`,
           backgroundSize: "cover",
@@ -51,7 +53,10 @@ const Cards = (props) => {
                 }}
               />
 
-              <Card.Title>{city.name}</Card.Title>
+              <Card.Title>
+                {city.name} {props.isUserLocation && <GeoAlt style={{ marginLeft: "8px", color: "black" }} />}{" "}
+                {/* se ha la props isUserLocation mi mette l'icon di react-bootstrap */}
+              </Card.Title>
               <Card.Text>{Math.round(city.main.temp - 273.15)}°C</Card.Text>
               <Card.Text className="text-capitalize">{city.weather[0].description}</Card.Text>
               <Card.Text>

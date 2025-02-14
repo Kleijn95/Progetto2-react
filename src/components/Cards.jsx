@@ -1,0 +1,77 @@
+import { useEffect, useState } from "react";
+import { Button, Card, Col } from "react-bootstrap";
+import { Link } from "react-router-dom";
+
+const Cards = (props) => {
+  const [city, setCity] = useState(null);
+
+  useEffect(() => {
+    fetchCities();
+  }, []);
+
+  const fetchCities = async () => {
+    try {
+      const response = await fetch(
+        `https://api.openweathermap.org/data/2.5/weather?lat=${props.lat}&lon=${props.lon}&appid=91b5ca7dea770ebd38fd11f37f7289c5`
+      );
+
+      if (response.ok) {
+        const data = await response.json();
+        setCity(data);
+      } else {
+        console.error("Errore nel recupero dei dati");
+      }
+    } catch (error) {
+      console.error("Errore di rete:", error);
+    }
+  };
+
+  return (
+    <Col xs={12} md={6} lg={3}>
+      <Card
+        style={{
+          backgroundImage: `url(${props.bgImage})`,
+          backgroundSize: "cover",
+          backgroundPosition: "center",
+          color: "white",
+        }}
+      >
+        <Card.Body style={{ position: "relative" }}>
+          {city ? (
+            <>
+              <img
+                src={`http://openweathermap.org/img/wn/${city.weather[0].icon}@2x.png`}
+                alt={city.weather[0].description}
+                style={{
+                  position: "absolute",
+                  top: 0,
+                  right: 0,
+                  width: "80px",
+                  height: "80px",
+                }}
+              />
+
+              <Card.Title>{city.name}</Card.Title>
+              <Card.Text>{Math.round(city.main.temp - 273.15)}°C</Card.Text>
+              <Card.Text className="text-capitalize">{city.weather[0].description}</Card.Text>
+              <Card.Text>
+                Massima: {Math.round(city.main.temp_max - 273.15)}°C / Minima: {Math.round(city.main.temp_min - 273.15)}
+                °C
+              </Card.Text>
+              <Card.Text>Percepita: {Math.round(city.main.feels_like - 273.15)}°C</Card.Text>
+            </>
+          ) : (
+            <Card.Text>Caricamento dati...</Card.Text>
+          )}
+          <Link to={`/search/${props.lat}/${props.lon}/`}>
+            <Button variant="primary" className="mt-3">
+              See next hours and day
+            </Button>
+          </Link>
+        </Card.Body>
+      </Card>
+    </Col>
+  );
+};
+
+export default Cards;

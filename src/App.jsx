@@ -52,7 +52,7 @@ function App() {
 
               <Container fluid>
                 <Row style={{ marginTop: "50px" }}>
-                  {/* Se l'utente accetta di mandare la localizzazione al brower la prima card sarà della sua località attuale (ho cercato su internet questa chicca che voleto mettere, la foto è relativa a catania purtroppo che è la mia corrente) */}
+                  {/* Se l'utente accetta di mandare la localizzazione al brower la prima card sarà della sua località attuale (ho cercato su internet questa chicca che voleto mettere, la foto è settata a Catania, non ho avuto tempo per renderla dinamica) */}
                   {userLocation && (
                     <Cards
                       bgImage="https://images.unsplash.com/photo-1584198686005-d9f5d63efa0e?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"

@@ -34,11 +34,25 @@ const Cards = (props) => {
         style={{
           backgroundImage: `url(${props.bgImage})`,
           backgroundSize: "cover",
+          overflow: "hidden",
           backgroundPosition: "center",
           color: "white",
         }}
       >
-        <Card.Body style={{ position: "relative" }}>
+        <Card.Body style={{ position: "relative", paddingTop: "50px" }}>
+          <div
+            style={{
+              position: "absolute",
+              top: "10px",
+              left: "10px",
+              backgroundColor: "rgba(0,0,0,0.7)",
+              color: "white",
+              padding: "5px 10px",
+              borderRadius: "5px",
+            }}
+          >
+            Meteo Attuale
+          </div>
           {city ? (
             <>
               <img
@@ -53,7 +67,7 @@ const Cards = (props) => {
                 }}
               />
 
-              <Card.Title>
+              <Card.Title className="fs-3">
                 {city.name} {props.isUserLocation && <GeoAlt style={{ marginLeft: "8px", color: "black" }} />}{" "}
                 {/* se ha la props isUserLocation  mi mette l'icon di react-bootstrap */}
               </Card.Title>
@@ -69,8 +83,8 @@ const Cards = (props) => {
             <Card.Text>Caricamento dati...</Card.Text>
           )}
           <Link to={`/search/${props.lat}/${props.lon}/`}>
-            <Button variant="primary" className="mt-3">
-              See next hours and day
+            <Button variant="info" className="mt-3">
+              See more forecasts.
             </Button>
           </Link>
         </Card.Body>

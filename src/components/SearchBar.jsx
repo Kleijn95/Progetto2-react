@@ -32,7 +32,7 @@ function SearchBar() {
   };
 
   return (
-    <div>
+    <div className="position-relative">
       <InputGroup className="mb-3">
         <Form.Control
           type="text"
@@ -44,7 +44,7 @@ function SearchBar() {
 
       {/* Dropdown per mostrare i risultati della ricerca */}
       {results.length > 0 && (
-        <ListGroup style={{ position: "absolute", zIndex: 10, width: "100%" }}>
+        <ListGroup style={{ position: "absolute", zIndex: 10, width: "100%", maxWidth: "100%" }}>
           {results.map(
             (
               result,

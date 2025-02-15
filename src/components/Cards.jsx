@@ -67,10 +67,11 @@ const Cards = (props) => {
                 }}
               />
 
-              <Card.Title className="fs-3">
-                {city.name} {props.isUserLocation && <GeoAlt style={{ marginLeft: "8px", color: "black" }} />}{" "}
-                {/* se ha la props isUserLocation  mi mette l'icon di react-bootstrap */}
+              <Card.Title className="fs-3 d-flex align-items-center">
+                {city.name}
+                {props.isUserLocation && <GeoAlt style={{ marginLeft: "8px", color: "white" }} />}
               </Card.Title>
+
               <Card.Text>{Math.round(city.main.temp - 273.15)}°C</Card.Text>
               <Card.Text className="text-capitalize">{city.weather[0].description}</Card.Text>
               <Card.Text>
